@@ -73,4 +73,12 @@ const Getstudents = Asynchandler(async (req,res) =>{
     .json(new Apiresponse(200,students,"All Students Loaded"))
 })
 
-export {AddStudent,SearchStudent,Getstudents}
+const UpdateStudents = Asynchandler(async (req,res) =>{
+
+})
+
+const DeleteStudent = Asynchandler(async (req,res) =>{
+
+})
+
+export {AddStudent,SearchStudent,Getstudents,UpdateStudents,DeleteStudent}
