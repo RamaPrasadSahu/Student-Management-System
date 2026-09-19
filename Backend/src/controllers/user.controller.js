@@ -1,28 +1,12 @@
 import { ApiError } from "../utils/ApiError.js";
 import { Apiresponse } from "../utils/Apiresponse.js";
-import {uploadoncloudinary} from "../utils/claudinary.js";
 import {Asynchandler} from "../utils/Asynchandler.js";
-import jwt from "jsonwebtoken";
 import {User} from "../models/user.model.js"
-import mongoose, { set } from "mongoose";
-
-const generateAccessAndRefreshToken = async(userId) =>{
-    try {
-        const user = await User.findById(userId)
-        const accesstoken = user.generateAccesstoken()
-        const refreshtoken = user.generateRefreshtoken()
-        user.refreshtoken = refreshtoken
-            await user.save({validateBeforeSave: false})
-            return {accesstoken,refreshtoken}
-    } catch (error) {
-        throw new ApiError(500,"Something went wrong while generating access and refresh Token")
-    }
-}
-
 
 const AddStudent = Asynchandler(async (req,res)=>{
-    const {fullName ,age,course,email,city } =req.body;
-    if([fullName ,age,course,email,city].some((field) =>field?.trim()===""))
+    const {name, age, course, email, city } =req.body;
+    const fullName = req.body.fullName || name;
+    if([fullName ,age,course,email,city].some((field) => String(field ?? "").trim()===""))
     {
         throw new ApiError(400,"All Fields Are Required")
     }
@@ -32,7 +16,7 @@ const AddStudent = Asynchandler(async (req,res)=>{
     if (existeduser) {
         throw new ApiError(400,"User already existed with this email & Fullname")
     }
-    const user = await User.create({
+    await User.create({
         fullName,
         age,
         course,
@@ -40,22 +24,15 @@ const AddStudent = Asynchandler(async (req,res)=>{
         city
     })
 
-    const createdUser = await User.findById(user._id).select(
-        "-password -refreshToken"
-    )
-
-    if (!createdUser) {
-        throw new ApiError(500, "Something went wrong while registering the user")
-    }
     return res.status(201).json(new Apiresponse(200,"User Registered SuccessFully"))
 })
 
 const SearchStudent = Asynchandler(async (req,res)=>{
-        const {fullName} = req.query;
+        const searchName = req.query.fullName || req.query.name || req.body?.fullName || req.body?.name || "";
         const user = await User.find({
-            fullName : { $regex : fullName || '',$options : 'i'}
+            fullName : { $regex : searchName,$options : 'i'}
         })
-        if (!user.length===0) {
+        if (!user.length) {
             throw new ApiError(404,"Student With This Name Is Not Found")
         }
         return res
@@ -75,7 +52,8 @@ const Getstudents = Asynchandler(async (req,res) =>{
 
 const UpdateStudents = Asynchandler(async (req,res) =>{
     const {id} = req.params;
-    const {fullName ,age,course,email,city} = req.body;
+    const {name, age, course, email, city} = req.body;
+    const fullName = req.body.fullName || name;
     const user = await User.findByIdAndUpdate(
         id,
         {
@@ -107,7 +85,7 @@ const DeleteStudent = Asynchandler(async (req,res) =>{
         throw new ApiError(404,"User Not Found")
     }
     return res
-    .status(201)
+    .status(200)
     .json(new Apiresponse(200,"Student Deleted SuccessFully"))
 })
 
