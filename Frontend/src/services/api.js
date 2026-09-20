@@ -3,7 +3,7 @@ import axios from "axios";
 const API = axios.create({
     baseURL:
         import.meta.env.VITE_API_URL ||
-        "http://localhost:8000/api/v1/users",
+        "/api/v1/users",
 
     headers: {
         "Content-Type": "application/json",
@@ -34,7 +34,8 @@ export const addStudent = async (studentData) => {
 
 // UPDATE student
 export const updateStudent = async (id, studentData) => {
-    const response = await API.put(`/Update/${id}`, toBackendStudent(studentData));
+    const payload = { id, ...toBackendStudent(studentData) };
+    const response = await API.put(`/Update?id=${id}`, payload);
     return unwrapResponse(response);
 };
 

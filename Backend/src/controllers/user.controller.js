@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { ApiError } from "../utils/ApiError.js";
 import { Apiresponse } from "../utils/Apiresponse.js";
 import {Asynchandler} from "../utils/Asynchandler.js";
@@ -36,7 +37,7 @@ const SearchStudent = Asynchandler(async (req,res)=>{
             throw new ApiError(404,"Student With This Name Is Not Found")
         }
         return res
-        .status(201)
+        .status(200)
         .json(new Apiresponse(200,user,"User Available"))
 })
 
@@ -46,40 +47,43 @@ const Getstudents = Asynchandler(async (req,res) =>{
         throw new ApiError(500,"Unable to Load All Students")
     }
     return res
-    .status(201)
+    .status(200)
     .json(new Apiresponse(200,students,"All Students Loaded"))
 })
 
 const UpdateStudents = Asynchandler(async (req,res) =>{
-    const {id} = req.params;
+    const id = req.params.id || req.query.id || req.body?.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid or missing Student ID");
+    }
     const {name, age, course, email, city} = req.body;
     const fullName = req.body.fullName || name;
+
+    const updateData = {};
+    if (fullName) updateData.fullName = fullName;
+    if (age !== undefined && age !== '') updateData.age = Number(age);
+    if (course) updateData.course = course;
+    if (email) updateData.email = email;
+    if (city) updateData.city = city;
+
     const user = await User.findByIdAndUpdate(
         id,
-        {
-        $set:{
-           fullName,
-           age,
-           course,
-           email,
-           city 
-        }
-    },
-    {
-        new : true,
-        runValidators : true
-    }
+        { $set: updateData },
+        { new: true, runValidators: true }
     );
     if (!user) {
-        throw new ApiError(404,"User Not Found")
+        throw new ApiError(404, "User Not Found");
     }
     return res
-    .status(201)
-    .json(new Apiresponse(200,user,"Update finished Successfully"))
+    .status(200)
+    .json(new Apiresponse(200, user, "Update finished Successfully"));
 })
 
 const DeleteStudent = Asynchandler(async (req,res) =>{
-    const {id} = req.query
+    const id = req.query.id || req.params.id || req.body?.id;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+        throw new ApiError(400, "Invalid or missing Student ID");
+    }
     const user = await User.findByIdAndDelete(id)
     if (!user) {
         throw new ApiError(404,"User Not Found")

@@ -5,18 +5,15 @@ import bcrypt from 'bcrypt'
 const userSchema = new Schema({
     fullName : {
         type : String,
-        required : true,
-        unique : true
+        required : true
     } ,
     age : {
-        type : String,
-        required : true,
-        unique : true
+        type : Number,
+        required : true
     },
     course : {
         type : String,
-        required : true,
-        unique : true
+        required : true
     },
     email : {
         type : String,
@@ -25,8 +22,7 @@ const userSchema = new Schema({
     },
     city : {
         type : String,
-        required : true,
-        unique : true
+        required : true
     }
 },
 {
