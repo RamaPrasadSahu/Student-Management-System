@@ -1,5 +1,7 @@
 import {Router} from 'express'
-
+import cors from 'cors'
+import express from 'express'
+const app = express()
 import {
   AddStudent,
   SearchStudent,
@@ -8,6 +10,11 @@ import {
   DeleteStudent
 } from "../controllers/user.controller.js"
 import {upload} from '../middlewares/multer.middleware.js'
+app.use(cors({
+    origin : process.env.CORS_ORIGIN,
+    credentials: true
+ }))
+
 const router = Router()
 router.route('/register').post(AddStudent);
 router.route('/search').post(SearchStudent);

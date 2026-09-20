@@ -65,6 +65,7 @@ const StudentList = ({
             <tbody>
               {students.map((student, index) => {
                 const id = getStudentId(student) || index + 1;
+                const displayName = student.fullName || student.name || '';
                 // Show shortened ID string if it's a long Mongo ObjectId
                 const displayId =
                   typeof id === 'string' && id.length > 8
@@ -76,7 +77,7 @@ const StudentList = ({
                     <td className="cell-id" title={id}>
                       <code>{displayId}</code>
                     </td>
-                    <td className="cell-name">{student.name}</td>
+                    <td className="cell-name">{displayName}</td>
                     <td>{student.age}</td>
                     <td>
                       <span className="badge badge-course">{student.course}</span>
@@ -93,7 +94,7 @@ const StudentList = ({
                       </button>
                       <button
                         className="btn btn-sm btn-outline-danger"
-                        onClick={() => onDelete(id, student.name)}
+                        onClick={() => onDelete(id, displayName)}
                         title="Delete Student"
                       >
                         Delete

@@ -1,60 +1,47 @@
-import axios from 'axios';
-
-// Get backend API URL from environment variables
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/students';
+import axios from "axios";
 
 const API = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+    baseURL:
+        import.meta.env.VITE_API_URL ||
+        "http://localhost:8000/api/v1/users",
+
+    headers: {
+        "Content-Type": "application/json",
+    },
 });
 
-/**
- * Fetch all students from backend
- * GET /
- */
+const toBackendStudent = (studentData) => ({
+    fullName: studentData.fullName || studentData.name,
+    age: studentData.age,
+    course: studentData.course,
+    email: studentData.email,
+    city: studentData.city,
+});
+
+const unwrapResponse = (response) => response.data?.data ?? response.data;
+
+// GET all students
 export const getStudents = async () => {
-  const response = await API.get('/');
-  // Return data array directly whether wrapped in response.data or response.data.data
-  if (Array.isArray(response.data)) {
-    return response.data;
-  }
-  if (response.data && Array.isArray(response.data.data)) {
-    return response.data.data;
-  }
-  return response.data;
+    const response = await API.get("/Get");
+    return unwrapResponse(response);
 };
 
-/**
- * Create a new student record
- * POST /
- * @param {Object} studentData - { name, age, course, email, city }
- */
+// ADD student
 export const addStudent = async (studentData) => {
-  const response = await API.post('/', studentData);
-  return response.data;
+    const response = await API.post("/register", toBackendStudent(studentData));
+    return unwrapResponse(response);
 };
 
-/**
- * Update an existing student record
- * PUT /:id
- * @param {string} id - Student ID (_id or id)
- * @param {Object} studentData - Updated student details
- */
+// UPDATE student
 export const updateStudent = async (id, studentData) => {
-  const response = await API.put(`/${id}`, studentData);
-  return response.data;
+    const response = await API.put(`/Update/${id}`, toBackendStudent(studentData));
+    return unwrapResponse(response);
 };
 
-/**
- * Delete a student record by ID
- * DELETE /:id
- * @param {string} id - Student ID (_id or id)
- */
+// DELETE student
 export const deleteStudent = async (id) => {
-  const response = await API.delete(`/${id}`);
-  return response.data;
+    const response = await API.delete(`/remove?id=${id}`);
+    return unwrapResponse(response);
 };
 
 export default API;

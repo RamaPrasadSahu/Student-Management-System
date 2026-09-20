@@ -15,7 +15,7 @@ const StudentForm = ({ currentStudent, onSubmit, onCancel, isLoading }) => {
   useEffect(() => {
     if (currentStudent) {
       setFormData({
-        name: currentStudent.name || '',
+        name: currentStudent.fullName || currentStudent.name || '',
         age: currentStudent.age || '',
         course: currentStudent.course || '',
         email: currentStudent.email || '',

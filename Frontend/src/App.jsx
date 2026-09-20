@@ -29,7 +29,7 @@ function App() {
     } catch (err) {
       console.error('Error fetching students:', err);
       setError(
-        'Unable to connect to backend server. Make sure Node Express server is running at http://localhost:5000'
+        'Unable to connect to backend server. Make sure Node Express server is running at http://localhost:8000'
       );
     } finally {
       setIsLoading(false);
@@ -92,7 +92,9 @@ function App() {
 
   // Handle Delete button click
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) {
+    const displayName = name || 'this student';
+
+    if (!window.confirm(`Are you sure you want to delete "${displayName}"?`)) {
       return;
     }
 
@@ -100,7 +102,7 @@ function App() {
     setError(null);
     try {
       await deleteStudent(id);
-      triggerSuccess(`Student "${name}" deleted successfully.`);
+      triggerSuccess(`Student "${displayName}" deleted successfully.`);
       await fetchAllStudents();
     } catch (err) {
       console.error('Error deleting student:', err);
@@ -115,7 +117,9 @@ function App() {
 
   // Filter students based on search input
   const filteredStudents = students.filter((student) =>
-    student.name?.toLowerCase().includes(searchTerm.toLowerCase().trim())
+    (student.fullName || student.name || '')
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase().trim())
   );
 
   return (
