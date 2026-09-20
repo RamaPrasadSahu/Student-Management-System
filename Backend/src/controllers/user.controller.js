@@ -79,7 +79,7 @@ const UpdateStudents = Asynchandler(async (req,res) =>{
 })
 
 const DeleteStudent = Asynchandler(async (req,res) =>{
-    const {id} = req.params
+    const {id} = req.query
     const user = await User.findByIdAndDelete(id)
     if (!user) {
         throw new ApiError(404,"User Not Found")

@@ -12,6 +12,6 @@ const router = Router()
 router.route('/register').post(AddStudent);
 router.route('/search').post(SearchStudent);
 router.route('/Get').get(Getstudents);
-router.route('/Update').get(UpdateStudents);
-router.route('/remove').get(DeleteStudent);
+router.route('/Update').put(UpdateStudents);
+router.route('/remove').delete(DeleteStudent);
 export default router
